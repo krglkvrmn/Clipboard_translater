@@ -1,0 +1,44 @@
+<MainWindow>:    
+    query_input: qi
+    dict_input: di
+    trans_inst: ti
+    hotkey: sw
+
+    orientation: 'vertical'
+    QueryInputField:
+        id: qi
+        text: ''
+        on_text_validate: self.on_enter(self.text)
+    TranslationField:
+        id: ti
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: 1,0.3
+        DictionaryInputField:
+            id: di
+            text: 'dictionary.txt'
+            size_hint: 0.8, 1
+        Switch:
+            id: sw
+            on_touch_down: root.switch_callback(self.active)
+            size_hint: 0.2, 1
+
+<QueryInputField>:
+    halign: 'center'
+    font_size: 32
+    size_hint: 1,0.5
+    multiline: False
+    background_color: 1,1,1,1
+
+<DictionaryInputField>:
+    halign: 'center'
+    font_size: 14
+    multiline: False
+    background_color: 1,1,1,1
+
+<TranslationField>:
+    text: ''
+    font_size: 20
+    text_size: self.width, None
+    valign: 'center'
+    halign: 'center'
