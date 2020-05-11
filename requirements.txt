@@ -1,3 +1,4 @@
+altgraph==0.17
 appdirs==1.4.3
 beautifulsoup4==4.9.0
 certifi==2020.4.5.1
@@ -16,6 +17,7 @@ lxml==4.5.0
 pexpect==4.8.0
 plyer==1.4.3
 ptyprocess==0.6.0
+pyenchant==3.0.1
 Pygments==2.6.1
 pyperclip==1.8.0
 python-xlib==0.27
