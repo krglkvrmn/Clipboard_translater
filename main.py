@@ -42,7 +42,7 @@ KV_FILE = """
         size_hint: 1,0.3
         DictionaryInputField:
             id: di
-            text: 'dictionary.txt'
+            text: 'dictionary.html'
             size_hint: 0.8, 1
         Switch:
             id: sw
