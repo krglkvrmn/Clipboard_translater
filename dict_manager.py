@@ -34,15 +34,17 @@ def update_dictionary(path, tt):
     to_write_str_txt = '{} {} - {}\n'.format(tt.word.lower(), tt.transcription, tt.translation)
     to_write_str = to_write_str_html if HTML else to_write_str_txt
 
-    with open(path, 'r') as file:
-        if to_write_str in file.read():
+    with open(path, 'rb') as file:
+        if to_write_str.encode('utf-8') in file.read():
             return
 
     if HTML:
-        with open(path, 'r') as file:
+        with open(path, 'rb') as file:
             contents = file.read()[90:]
-        with open(path, 'w') as file:
-            file.write(HTML_INIT_TEMPLATE.format(to_write_str + contents))
+        with open(path, 'wb') as file:
+            file.write(HTML_INIT_TEMPLATE.format(to_write_str + contents).encode('utf-8'))
     else:
+        with open(path, 'ab') as file:
+            file.write(to_write_str.encode('utf-8'))
         with open(path, 'a') as file:
-            file.write(to_write_str)
+            file.write('\n')
