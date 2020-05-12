@@ -6,7 +6,7 @@ block_cipher = None
 
 
 a = Analysis(['fork_main.py'],
-             pathex=['C:\\Users\\Duck\\repositories\\Clipboard_translater'],
+             pathex=['.'],
              binaries=[],
              datas=[],
              hiddenimports=['pkg_resources.py2_warn', 'plyer.platforms.win.notification'],
