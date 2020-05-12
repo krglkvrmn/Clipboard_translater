@@ -8,6 +8,7 @@ from kivy.uix.label import Label
 from kivy.properties import ObjectProperty, BooleanProperty
 from kivy.clock import Clock
 from kivy.uix.switch import Switch
+from kivy.lang import Builder
 import translater
 from multiprocessing import Process
 from plyer import notification
@@ -18,12 +19,65 @@ import re
 import time
 
 
+KV_FILE = """
+<MainWindow>: 
+    height: 200
+    width: 500
+    size_hint: 1, 1  
+    query_input: qi
+    dict_input: di
+    trans_inst: ti
+    hotkey: sw
+
+    orientation: 'vertical'
+    QueryInputField:
+        id: qi
+        text: ''
+        on_text_validate: self.on_enter(self.text)
+    TranslationField:
+        id: ti
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: 1,0.3
+        DictionaryInputField:
+            id: di
+            text: 'dictionary.txt'
+            size_hint: 0.8, 1
+        Switch:
+            id: sw
+            size_hint: 0.2, 1
+
+<QueryInputField>:
+    halign: 'center'
+    font_size: 32
+    size_hint: 1,0.5
+    multiline: False
+    background_color: 1,1,1,1
+
+<DictionaryInputField>:
+    halign: 'center'
+    font_size: 14
+    multiline: False
+    background_color: 1,1,1,1
+
+<TranslationField>:
+    text: ''
+    font_size: 20
+    text_size: self.width, None
+    valign: 'center'
+    halign: 'center'
+"""
+
+
 Config.set('graphics', 'resizable', '0')
 Config.set('graphics', 'width', '500')
 Config.set('graphics', 'height', '200')
 
 def update_dictionary(path, tt):
-    filename = re.search(r'/?(\w+\..{3})', path).group(1)
+    try:
+        filename = re.search(r'/?(\w+\..{3})', path).group(1)
+    except AttributeError:
+        return
     directory = re.search(r'.*/', path)
     if directory:
         directory = directory.group(0)
@@ -33,27 +87,22 @@ def update_dictionary(path, tt):
         with open(path, 'w') as file:
             pass
     to_write_str = f'{tt.word.lower()} {tt.transcription} - {tt.translation}\n'
-    with open(path, 'r') as file:
-        if to_write_str in file.read():
+    with open(path, 'rb') as file:
+        if to_write_str.encode('utf-8') in file.read():
             return
+    with open(path, 'ab') as file:
+        file.write(to_write_str.encode('utf-8'))
     with open(path, 'a') as file:
-        file.write(to_write_str)
+        file.write('\n')
 
 class MainWindow(BoxLayout):
     query_input = ObjectProperty(None)
     dict_input = ObjectProperty(None)
     trans_inst = ObjectProperty(None)
     hotkey = ObjectProperty(None)
-    enable_hotkey = BooleanProperty(False)
-
-    def switch_callback(self, active):
-        if not active:
-            self.enable_hotkey = True
-        else:
-            self.enable_hotkey = False
 
     def check_hotkey(self, dt):
-        if keyboard.is_pressed('ctrl+c') and self.enable_hotkey:
+        if keyboard.is_pressed('ctrl+c') and self.hotkey.active:
             self.hotkey_action()
             time.sleep(1)
 
@@ -67,7 +116,7 @@ class MainWindow(BoxLayout):
         else:
             translation = 'No translation found!'
         self.trans_inst.text = translation
-        notification.notify(message=translation, title=f'Перевод {word}', timeout=6)
+        notification.notify(message=translation, title=f'Перевод "{word}"', timeout=6)
 
 
 
@@ -88,12 +137,12 @@ class DictionaryInputField(TextInput):
 class TranslationField(Label):
     pass
 
-class ClipTransApp(App):
+class TranslaterApp(App):
     def build(self):
-        self.load_kv('clipTrans.kv')
+        Builder.load_string(KV_FILE)
         main = MainWindow()
         Clock.schedule_interval(main.check_hotkey, 1/60)
         return main
 
 if __name__ == '__main__':
-	ClipTransApp().run()
+	TranslaterApp().run()

@@ -1,4 +1,7 @@
-<MainWindow>:    
+<MainWindow>: 
+	height: 200
+	width: 500
+	size_hint: 1, 1  
     query_input: qi
     dict_input: di
     trans_inst: ti
@@ -20,7 +23,6 @@
             size_hint: 0.8, 1
         Switch:
             id: sw
-            on_touch_down: root.switch_callback(self.active)
             size_hint: 0.2, 1
 
 <QueryInputField>:

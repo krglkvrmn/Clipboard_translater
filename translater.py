@@ -14,7 +14,8 @@ def translate_from_clip():
         word = clip_text
         translation = soup.find('span', class_='t_inline_en').text
         transcription = soup.find('span', class_='transcription').text
-    except AttributeError:
+    except AttributeError as exc:
+        print(exc)
         return
     return Translation(word, transcription, translation)
 
@@ -26,7 +27,8 @@ def translate_from_str(text):
         word = text
         translation = soup.find('span', class_='t_inline_en').text
         transcription = soup.find('span', class_='transcription').text
-    except AttributeError:
+    except AttributeError as exc:
+        print(exc)
         return
     return Translation(word, transcription, translation)
 

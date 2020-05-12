@@ -4,7 +4,6 @@ beautifulsoup4==4.9.0
 certifi==2020.4.5.1
 chardet==3.0.4
 clipboard==0.0.4
-dbus-python==1.2.16
 distlib==0.3.0
 docutils==0.16
 filelock==3.0.12
