@@ -12,6 +12,7 @@ from kivy.lang import Builder
 import translater
 from multiprocessing import Process
 from plyer import notification
+from dict_manager import update_dictionary
 import os
 import clipboard as clip
 import keyboard
@@ -20,10 +21,10 @@ import time
 
 
 KV_FILE = """
-<MainWindow>: 
+<MainWindow>:
     height: 200
     width: 500
-    size_hint: 1, 1  
+    size_hint: 1, 1
     query_input: qi
     dict_input: di
     trans_inst: ti
@@ -73,27 +74,6 @@ Config.set('graphics', 'resizable', '0')
 Config.set('graphics', 'width', '500')
 Config.set('graphics', 'height', '200')
 
-def update_dictionary(path, tt):
-    try:
-        filename = re.search(r'/?(\w+\..{3})', path).group(1)
-    except AttributeError:
-        return
-    directory = re.search(r'.*/', path)
-    if directory:
-        directory = directory.group(0)
-    else:
-        directory = '.'
-    if filename not in os.listdir(directory):
-        with open(path, 'w') as file:
-            pass
-    to_write_str = f'{tt.word.lower()} {tt.transcription} - {tt.translation}\n'
-    with open(path, 'rb') as file:
-        if to_write_str.encode('utf-8') in file.read():
-            return
-    with open(path, 'ab') as file:
-        file.write(to_write_str.encode('utf-8'))
-    with open(path, 'a') as file:
-        file.write('\n')
 
 class MainWindow(BoxLayout):
     query_input = ObjectProperty(None)
