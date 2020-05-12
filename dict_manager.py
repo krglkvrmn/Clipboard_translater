@@ -43,7 +43,7 @@ def update_dictionary(path, tt):
             return
 
     if HTML:
-        with open(path, 'rb') as file:
+        with open(path, 'r') as file:
             contents = file.read()[90:]
         with open(path, 'wb') as file:
             file.write(HTML_INIT_TEMPLATE.format(to_write_str + contents).encode('utf-8'))
