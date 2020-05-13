@@ -1,3 +1,7 @@
+import re
+import os
+
+
 HTML_INIT_TEMPLATE = """
 <table>
     <tr>
