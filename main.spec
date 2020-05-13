@@ -5,7 +5,7 @@ from kivy_deps import sdl2, glew
 block_cipher = None
 
 
-a = Analysis(['fork_main.py'],
+a = Analysis(['main.py'],
              pathex=['.'],
              binaries=[],
              datas=[],
