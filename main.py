@@ -26,7 +26,6 @@ KV_FILE = """
     width: 500
     size_hint: 1, 1
     query_input: qi
-    dict_input: di
     trans_inst: ti
     hotkey: sw
 
@@ -40,24 +39,13 @@ KV_FILE = """
     BoxLayout:
         orientation: 'horizontal'
         size_hint: 1,0.3
-        DictionaryInputField:
-            id: di
-            text: 'dictionary.html'
-            size_hint: 0.8, 1
         Switch:
             id: sw
-            size_hint: 0.2, 1
 
 <QueryInputField>:
     halign: 'center'
     font_size: 32
     size_hint: 1,0.5
-    multiline: False
-    background_color: 1,1,1,1
-
-<DictionaryInputField>:
-    halign: 'center'
-    font_size: 14
     multiline: False
     background_color: 1,1,1,1
 
@@ -77,7 +65,6 @@ Config.set('graphics', 'height', '200')
 
 class MainWindow(BoxLayout):
     query_input = ObjectProperty(None)
-    dict_input = ObjectProperty(None)
     trans_inst = ObjectProperty(None)
     hotkey = ObjectProperty(None)
 
@@ -92,7 +79,7 @@ class MainWindow(BoxLayout):
         trans_tuple = translater.translate_from_str(self.query_input.text)
         if trans_tuple:
             translation = trans_tuple.translation
-            update_dictionary(self.dict_input.text, trans_tuple)
+            update_dictionary('dictionary.html', trans_tuple)
         else:
             translation = 'No translation found!'
         self.trans_inst.text = translation
@@ -106,7 +93,7 @@ class QueryInputField(TextInput):
         trans_tuple = translater.translate_from_str(instance.text)
         if trans_tuple:
             translation = trans_tuple.translation
-            update_dictionary(instance.parent.dict_input.text, trans_tuple)
+            update_dictionary('dictionary.html', trans_tuple)
         else:
             translation = 'No translation found!'
         instance.parent.trans_inst.text = translation
