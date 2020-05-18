@@ -69,7 +69,8 @@ class MainWindow(BoxLayout):
     hotkey = ObjectProperty(None)
 
     def check_hotkey(self, dt):
-        if keyboard.is_pressed('ctrl+c') and self.hotkey.active:
+        if (keyboard.is_pressed('ctrl+c') or keyboard.is_pressed('ctrl+shift+c')) and self.hotkey.active:
+            time.sleep(1.5)
             self.hotkey_action()
             time.sleep(1)
 
