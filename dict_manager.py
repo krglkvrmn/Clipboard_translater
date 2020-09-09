@@ -2,18 +2,18 @@ import re
 import os
 
 
-HTML_INIT_TEMPLATE = """
+HTML_INIT_TEMPLATE = b"""
 <table>
     <tr>
         <th>Word</th><th>Transcription</th><th>Translation</th>
     </tr>
-    {}
+    %b
 </table>
 """
 
-HTML_INSERTION_TEMPLATE = """
+HTML_INSERTION_TEMPLATE = b"""
 <tr>
-    <td>{}</td><td>{}</td><td>{}</td>
+    <td>%b</td><td>%b</td><td>%b</td>
 </tr>
 """
 
@@ -28,27 +28,26 @@ def update_dictionary(path, tt):
 
     if filename not in os.listdir(directory):
         if HTML:
-            with open(path, 'w') as file:
-                file.write(HTML_INIT_TEMPLATE.format(''))
+            with open(path, 'wb') as file:
+                file.write(HTML_INIT_TEMPLATE % b'')
         else:
             with open(path, 'w') as file:
                 pass
 
-    to_write_str_html = HTML_INSERTION_TEMPLATE.format(tt.word.lower(), tt.transcription, tt.translation)
-    to_write_str_txt = '{} {} - {}\n'.format(tt.word.lower(), tt.transcription, tt.translation)
+    to_write_str_html = HTML_INSERTION_TEMPLATE % (tt.word.lower().encode('utf-8'), tt.transcription.encode('utf-8'), tt.translation.encode('utf-8'))
+    to_write_str_txt = b'%b %b - %b\n' % (tt.word.lower().encode('utf-8'), tt.transcription.encode('utf-8'), tt.translation.encode('utf-8'))
     to_write_str = to_write_str_html if HTML else to_write_str_txt
 
     with open(path, 'rb') as file:
-        if to_write_str.encode('utf-8') in file.read():
+        if to_write_str in file.read():
             return
 
     if HTML:
-        with open(path, 'r') as file:
-            contents = file.read()[90:]
+        with open(path, 'rb') as file:
+            contents = file.read()[91:-9]
         with open(path, 'wb') as file:
-            file.write(HTML_INIT_TEMPLATE.format(to_write_str + contents).encode('utf-8'))
+            file.write(HTML_INIT_TEMPLATE % (to_write_str + contents))
     else:
         with open(path, 'ab') as file:
             file.write(to_write_str.encode('utf-8'))
-        with open(path, 'a') as file:
-            file.write('\n')
+
