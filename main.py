@@ -1,25 +1,26 @@
-from kivy.app import App
-from kivy.config import Config
-from kivy.uix.widget import Widget
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
-from kivy.uix.label import Label
-from kivy.properties import ObjectProperty, BooleanProperty
-from kivy.clock import Clock
-from kivy.uix.switch import Switch
-from kivy.lang import Builder
-import translater
 from multiprocessing import Process
-from plyer import notification
-from dict_manager import update_dictionary
 import os
-import clipboard as clip
-import keyboard
 import re
 import time
+import clipboard as clip
+from kivy.app import App
+from kivy.clock import Clock
+from kivy.config import Config
+from kivy.lang import Builder
+from kivy.properties import ObjectProperty, BooleanProperty
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
+from kivy.uix.switch import Switch
+import keyboard
+from plyer import notification
+from dict_manager import update_dictionary
+import translater
 
 
+# Separate file was not rendered correctly
 KV_FILE = """
 <MainWindow>:
     height: 200
@@ -64,33 +65,53 @@ Config.set('graphics', 'height', '200')
 
 
 class MainWindow(BoxLayout):
+    # Instance of input field.
     query_input = ObjectProperty(None)
+    # Instance of translation field.
     trans_inst = ObjectProperty(None)
+    # Instance of hotkey on/off switch.
     hotkey = ObjectProperty(None)
 
-    def check_hotkey(self, dt):
+    def _check_hotkey(self, dt):
+        """
+        Checks hotkey condition and calls hotkey action function if hotkey mode is enabled.
+        """
         if (keyboard.is_pressed('ctrl+c') or keyboard.is_pressed('ctrl+shift+c')) and self.hotkey.active:
+            # Copying of text into clipboard can take great amount of time.
+            # This prevents action function from reading wrong clipboard content.
             time.sleep(1.5)
-            self.hotkey_action()
+            self._hotkey_action()
             time.sleep(1)
 
-    def hotkey_action(self):
+    def _hotkey_action(self):
+        """
+        Translate word, write results into dictionary and notify user if
+        hotkey is pressed.
+        """
         word = clip.paste()
+        # Place requested word in input field.
         self.query_input.text = word
+        # Translate word.
         trans_tuple = translater.translate_from_str(self.query_input.text)
         if trans_tuple:
             translation = trans_tuple.translation
+            # Write result in HTML dictionary.
             update_dictionary('dictionary.html', trans_tuple)
         else:
             translation = 'No translation found!'
+        # Show translation in GUI.
         self.trans_inst.text = translation
+        # Notification containing translation results.
         notification.notify(message=translation, title=f'Перевод "{word}"', timeout=6)
 
 
-
 class QueryInputField(TextInput):
-
     def on_enter(instance, value):
+        """
+        The function are triggered by pressing 'enter' while typing
+        in input field.
+        Shows translation in GUI and updates dictionary.
+        """
         trans_tuple = translater.translate_from_str(instance.text)
         if trans_tuple:
             translation = trans_tuple.translation
@@ -99,17 +120,17 @@ class QueryInputField(TextInput):
             translation = 'No translation found!'
         instance.parent.trans_inst.text = translation
 
-class DictionaryInputField(TextInput):
-    pass
 
 class TranslationField(Label):
     pass
+
 
 class TranslaterApp(App):
     def build(self):
         Builder.load_string(KV_FILE)
         main = MainWindow()
-        Clock.schedule_interval(main.check_hotkey, 1/60)
+        # Check if hotkey was pressed.
+        Clock.schedule_interval(main._check_hotkey, 1/60)
         return main
 
 if __name__ == '__main__':
