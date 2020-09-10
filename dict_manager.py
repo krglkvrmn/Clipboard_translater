@@ -1,6 +1,6 @@
 import os
 import re
-from trabslater import Translation
+from translater import Translation
 
 
 HTML_INIT_TEMPLATE = b"""
