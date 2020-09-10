@@ -1,5 +1,6 @@
-import re
 import os
+import re
+from trabslater import Translation
 
 
 HTML_INIT_TEMPLATE = b"""
@@ -17,7 +18,16 @@ HTML_INSERTION_TEMPLATE = b"""
 </tr>
 """
 
-def update_dictionary(path, tt):
+def update_dictionary(path: str, tt: Translation):
+    """
+    Update dictionary with translation results.
+
+    Input:
+            1. Path to file to write changes into.
+            2. Translation object containing translation,
+            transcription and word itself.
+    """
+    # Parse file name and directory from path.
     filename = re.search(r'/?(\w+\..{3,4})', path).group(1)
     directory = re.search(r'.*/', path)
     if directory:
@@ -33,7 +43,7 @@ def update_dictionary(path, tt):
         else:
             with open(path, 'w') as file:
                 pass
-
+    # Insert results into template
     to_write_str_html = HTML_INSERTION_TEMPLATE % (tt.word.lower().encode('utf-8'), tt.transcription.encode('utf-8'), tt.translation.encode('utf-8'))
     to_write_str_txt = b'%b %b - %b\n' % (tt.word.lower().encode('utf-8'), tt.transcription.encode('utf-8'), tt.translation.encode('utf-8'))
     to_write_str = to_write_str_html if HTML else to_write_str_txt
