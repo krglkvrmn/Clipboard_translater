@@ -137,8 +137,8 @@ class DictManager:
         # Add new translation
         current.insert(0, translation)
         rendered = self.render_dict(current)
-        with open(f'{self.lang}_dictionary.html', 'w') as file:
-            file.write(rendered)
+        with open(f'{self.lang}_dictionary.html', 'wb') as file:
+            file.write(rendered.encode('utf-8'))
 
 
 

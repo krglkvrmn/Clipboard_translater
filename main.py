@@ -26,6 +26,7 @@ KV_FILE = """
     height: 200
     width: 500
     size_hint: 1, 1
+    resizable: False
     query_input: qi
     trans_inst: ti
     hotkey: sw
@@ -106,13 +107,13 @@ class MainWindow(BoxLayout):
         Translate word, write results into dictionary and notify user if
         hotkey is pressed.
         """
-        word = clip.paste()
+        word = clip.paste().lower().strip()
         # Place requested word in input field.
         self.query_input.text = word
         # Current language
         self.dict_manager.lang = self.sett_man.lang_select.text
         # Translate word.
-        trans_tuple = translate(word.lower(), self.dict_manager.lang.lower(), render=True)
+        trans_tuple = translate(word, self.dict_manager.lang.lower(), render=True)
         if trans_tuple:
             translation = trans_tuple.translations
             if not (self.sett_man.lang_select.text == "Guess"):
@@ -136,7 +137,7 @@ class QueryInputField(TextInput):
         """
         lang = instance.parent.sett_man.lang_select.text
         instance.parent.dict_manager.lang = lang
-        trans_tuple = translate(instance.text.lower(), lang.lower(), render=True)
+        trans_tuple = translate(instance.text.lower().strip(), lang.lower(), render=True)
         if trans_tuple:
             translation = trans_tuple.translations
             if not (instance.parent.sett_man.lang_select.text == "Guess"):
