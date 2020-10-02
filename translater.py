@@ -1,34 +1,51 @@
-import requests
-import clipboard as clip
+from googletrans import Translator, LANGUAGES
 from collections import namedtuple
-from bs4 import BeautifulSoup
 
-Translation = namedtuple('Translation', ['word', 'transcription', 'translation'])
 
-def translate_from_clip():
-    form_url = 'https://wooordhunt.ru/word/postsearch'
-    clip_text = clip.paste()
-    response = requests.post(form_url, data={"word": clip_text})
+LANGCODES = dict(map(reversed, LANGUAGES.items()))
+
+# Defining basic structure for translation representation.
+Translation = namedtuple('Translation', ['word', 'translations', 'examples'])
+Translation_for_render = namedtuple('Translation', ['word', 'translations', 'trigger', 'examples'])
+
+
+def translate(word, language, render=False):
+    """
+        Translate word from input language to russian.
+        Render argument defines special output format, which is
+        convenient to be used in dropdown menu.
+    """
+    translator = Translator()
+    # Select language code
+    lang = "auto" if language == "guess" else LANGCODES[language]
+    raw_translation = translator.translate(word, dest="ru", src=lang)
+    json_data = raw_translation.extra_data
+    all_translations = []
+    all_examples = []
     try:
-        soup = BeautifulSoup(response.content.decode('utf-8'), 'lxml')
-        word = clip_text
-        translation = soup.find('span', class_='t_inline_en').text
-        transcription = soup.find('span', class_='transcription').text
-    except AttributeError:
-        return
-    return Translation(word, transcription, translation)
-
-def translate_from_str(text):
-    form_url = 'https://wooordhunt.ru/word/postsearch'
-    response = requests.post(form_url, data={"word": text})
+        for word_type in json_data["all-translations"]:
+            all_translations.extend(word_type[1])
+    # Translation does not exists
+    except IndexError:
+        print(1, json_data)
+        return None
+    # ????
+    except TypeError:
+        all_translations = [json_data["translation"][0][0]]
+    all_translations = ", ".join(all_translations)
     try:
-        soup = BeautifulSoup(response.content.decode('utf-8'), 'lxml')
-        word = text
-        translation = soup.find('span', class_='t_inline_en').text
-        transcription = soup.find('span', class_='transcription').text
-    except AttributeError:
-        return
-    return Translation(word, transcription, translation)
+        for example in json_data["examples"][0]:
+            all_examples.append(example[0])
+    # No examples for this word
+    except TypeError:
+        all_examples = ['', '']
+    if ''.join(all_translations.split()) == ''.join(word.split()):
+        return None
+    if render:
+        return Translation_for_render(word, all_translations, all_examples[0], all_examples[1:])
+    elif not render:
+        return Translation(word, all_translations, all_examples)
+
 
 if __name__ == '__main__':
-    print(translate_from_clip())
+    print(LANGCODES)
