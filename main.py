@@ -1,4 +1,3 @@
-from multiprocessing import Process
 import os
 import re
 import time
@@ -10,15 +9,15 @@ from kivy.lang import Builder
 from kivy.properties import ObjectProperty, BooleanProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-from kivy.uix.dropdown import DropDown
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.switch import Switch
 import keyboard
 from plyer import notification
-from dict_manager import update_dictionary
-import translater
+from dict_manager import DictManager
+from translater import translate, Translation, Translation_for_render
+from kivy.uix.spinner import Spinner
 
 
 # Separate file was not rendered correctly
@@ -48,17 +47,14 @@ KV_FILE = """
             id: sm
             orientation: 'horizontal'
             lang_select: lang_sel
-            trans_select: trans_sel
-            call_ls: call_ls
-            call_tr: call_tr
-            DropdownCallButton:
-                id: call_ls
             LanguageSelectField:
                 id: lang_sel
-            DropdownCallButton:
-                id: call_tr
-            TranslaterSelectField:
-                id: trans_sel
+                text: 'Guess'
+                values: self.AVAILABLE_LANGS
+                size_hint: 1,0.45
+                pos_hint: {'top':0.7}
+                sync_height: True
+
 
 <QueryInputField>:
     halign: 'center'
@@ -74,20 +70,12 @@ KV_FILE = """
     valign: 'center'
     halign: 'center'
 
-<DropdownCallButton>:
-    size_hint: 1,0.4
-    pos_hint: {'top':0.5}
 """
 
-AVAILABLE_LANGS = ["English", "Deutsch", "Guess"]
-AVAILABLE_TRANSLATERS = {"English": ["wooordhunt", "yandex"],
-                         "Deutsch": ["yandex"],
-                         "Guess": [""]}
 
-
-Config.set('graphics', 'resizable', '0')
-Config.set('graphics', 'width', '500')
-Config.set('graphics', 'height', '200')
+Config.set('graphics', 'resizable', 0)
+Config.set('graphics', 'width', 500)
+Config.set('graphics', 'height', 200)
 
 
 class MainWindow(BoxLayout):
@@ -99,6 +87,8 @@ class MainWindow(BoxLayout):
     hotkey = ObjectProperty(None)
     # Settings manager instance
     sett_man = ObjectProperty(None)
+    # Dictionary updater
+    dict_manager = DictManager()
 
     def _check_hotkey(self, dt):
         """
@@ -119,18 +109,20 @@ class MainWindow(BoxLayout):
         word = clip.paste()
         # Place requested word in input field.
         self.query_input.text = word
+        # Current language
+        self.dict_manager.lang = self.sett_man.lang_select.text
         # Translate word.
-        trans_tuple = translater.translate_from_str(self.query_input.text)
+        trans_tuple = translate(word.lower(), self.dict_manager.lang.lower(), render=True)
         if trans_tuple:
-            translation = trans_tuple.translation
-            # Write result in HTML dictionary.
-            update_dictionary('dictionary.html', trans_tuple)
+            translation = trans_tuple.translations
+            if not (self.sett_man.lang_select.text == "Guess"):
+                self.dict_manager.update_dict(trans_tuple)
         else:
             translation = 'No translation found!'
         # Show translation in GUI.
         self.trans_inst.text = translation
         # Notification containing translation results.
-        notification.notify(message=translation, title=f'Перевод "{word}"', timeout=6)
+        notification.notify(message=translation, title=f'Перевод "{word}"', timeout=10)
 
 
 
@@ -142,10 +134,13 @@ class QueryInputField(TextInput):
         in input field.
         Shows translation in GUI and updates dictionary.
         """
-        trans_tuple = translater.translate_from_str(instance.text)
+        lang = instance.parent.sett_man.lang_select.text
+        instance.parent.dict_manager.lang = lang
+        trans_tuple = translate(instance.text.lower(), lang.lower(), render=True)
         if trans_tuple:
-            translation = trans_tuple.translation
-            update_dictionary('dictionary.html', trans_tuple)
+            translation = trans_tuple.translations
+            if not (instance.parent.sett_man.lang_select.text == "Guess"):
+                instance.parent.dict_manager.update_dict(trans_tuple)
         else:
             translation = 'No translation found!'
         instance.parent.trans_inst.text = translation
@@ -158,46 +153,10 @@ class TranslationField(Label):
 class SettingsManager(BoxLayout):
     # Instance of language select dropdown menu
     lang_select = ObjectProperty(None)
-    # Instance of translater select dropdown menu
-    trans_select = ObjectProperty(None)
-    # Main button for language dropdown
-    call_ls = ObjectProperty(None)
-    # Main button for translater dropdown
-    call_tr = ObjectProperty(None)
-
-    def setup_language_dropdown(self):
-        def __on_select(inst, data):
-            self.call_ls.text = data
-            self.setup_trans_dropdown()
-        dropdown = self.lang_select              # Alias
-        self.call_ls.text = "English"
-        for lang in AVAILABLE_LANGS:
-            btn = Button(text=lang, size_hint_y=None, height=44)
-            btn.bind(on_release=lambda btn: dropdown.select(btn.text))
-            dropdown.add_widget(btn)
-        self.call_ls.bind(on_release=dropdown.open)
-        dropdown.bind(on_select=__on_select)
-
-    def setup_trans_dropdown(self):
-        current_lang = self.call_ls.text
-        dropdown = self.trans_select
-        dropdown.clear_widgets()
-        tr_list =  AVAILABLE_TRANSLATERS[current_lang]
-        self.call_tr.text = tr_list[0]
-        for trans in tr_list:
-            btn = Button(text=trans, size_hint_y=None, height=44)
-            btn.bind(on_release=lambda btn: dropdown.select(btn.text))
-            dropdown.add_widget(btn)
-        self.call_tr.bind(on_release=dropdown.open)
-        dropdown.bind(on_select=lambda inst, data: setattr(self.call_tr, "text", data))
 
 
-class LanguageSelectField(DropDown):
-    pass
-
-
-class TranslaterSelectField(DropDown):
-    pass
+class LanguageSelectField(Spinner):
+    AVAILABLE_LANGS = ("Guess", "English", "German")
 
 
 class DropdownCallButton(Button):
@@ -208,8 +167,6 @@ class TranslaterApp(App):
     def build(self):
         Builder.load_string(KV_FILE)
         main = MainWindow()
-        main.sett_man.setup_language_dropdown()
-        main.sett_man.setup_trans_dropdown()
         # Check if hotkey was pressed.
         Clock.schedule_interval(main._check_hotkey, 1/60)
         return main
