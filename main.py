@@ -112,10 +112,14 @@ class MainWindow(BoxLayout):
         # Current language
         self.dict_manager.lang = self.sett_man.lang_select.text
         # Translate word.
-        try:
-            trans_tuple = translate(word.lower(), self.dict_manager.lang.lower(), render=True)
-        except AttributeError:
-            notification.notify(message=translation, title=f'Try again!', timeout=2)
+        for _ in range(10):
+            try:
+                trans_tuple = translate(word.lower(), self.dict_manager.lang.lower(), render=True)
+                break
+            except AttributeError:
+                pass
+        else:
+            notification.notify(message="", title=f'Перевод "{word}"', timeout=1)
             return
         if trans_tuple:
             translation = trans_tuple.translations
