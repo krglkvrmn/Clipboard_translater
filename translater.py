@@ -48,4 +48,4 @@ def translate(word, language, render=False):
 
 
 if __name__ == '__main__':
-    print(LANGCODES)
+    print(translate("example", "english"))
