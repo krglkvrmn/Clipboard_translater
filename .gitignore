@@ -1,3 +1,4 @@
+.gitignore
 venv/
 TranslaterApp/
 __pycache__/

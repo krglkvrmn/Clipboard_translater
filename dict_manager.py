@@ -49,9 +49,9 @@ DICTIONARY_TEMPLATE = """<html>
 		</style>
 	</head>
     <body>
-    	<table>
-    		<thead>
-    			<th>Word</th><th>Translations</th><th>Examples</th>
+        <table>
+            <thead>
+  			<th>Word</th><th>Translations</th><th>Examples</th>
     		</thead>  		
     		<tbody class="Main-table">
                 {% for translation in translations %}

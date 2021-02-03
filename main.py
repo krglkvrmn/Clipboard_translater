@@ -112,7 +112,15 @@ class MainWindow(BoxLayout):
         # Current language
         self.dict_manager.lang = self.sett_man.lang_select.text
         # Translate word.
-        trans_tuple = translate(word.lower(), self.dict_manager.lang.lower(), render=True)
+        for _ in range(10):
+            try:
+                trans_tuple = translate(word.lower(), self.dict_manager.lang.lower(), render=True)
+                break
+            except AttributeError:
+                pass
+        else:
+            notification.notify(message="", title='Try again!', timeout=1)
+            return
         if trans_tuple:
             translation = trans_tuple.translations
             if not (self.sett_man.lang_select.text == "Guess"):
@@ -136,7 +144,16 @@ class QueryInputField(TextInput):
         """
         lang = instance.parent.sett_man.lang_select.text
         instance.parent.dict_manager.lang = lang
-        trans_tuple = translate(instance.text.lower(), lang.lower(), render=True)
+        for _ in range(15):
+            try:
+                trans_tuple = translate(instance.text.lower(), lang.lower(), render=True)
+                break
+            except AttributeError:
+                pass
+        else:
+            notification.notify(message="", title='Try again!', timeout=1)
+            return
+
         if trans_tuple:
             translation = trans_tuple.translations
             if not (instance.parent.sett_man.lang_select.text == "Guess"):
@@ -156,7 +173,7 @@ class SettingsManager(BoxLayout):
 
 
 class LanguageSelectField(Spinner):
-    AVAILABLE_LANGS = ("Guess", "English", "German")
+    AVAILABLE_LANGS = ("Guess", "English", "German", "French")
 
 
 class DropdownCallButton(Button):
