@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['/home/roman/projects/Clipboard_translater'],
+             pathex=['/home/user/.../Clipboard_translater'], # Example
              binaries=[],
              datas=[],
              hiddenimports=['plyer.platforms.linux.notification'],
