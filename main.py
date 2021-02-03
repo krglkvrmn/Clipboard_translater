@@ -73,9 +73,9 @@ KV_FILE = """
 """
 
 
-Config.set('graphics', 'resizable', 0)
-Config.set('graphics', 'width', 500)
-Config.set('graphics', 'height', 200)
+Config.set('graphics', 'resizable', '0')
+Config.set('graphics', 'width', '500')
+Config.set('graphics', 'height', '200')
 
 
 class MainWindow(BoxLayout):
