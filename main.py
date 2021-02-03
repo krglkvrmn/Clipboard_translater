@@ -112,7 +112,7 @@ class MainWindow(BoxLayout):
         # Current language
         self.dict_manager.lang = self.sett_man.lang_select.text
         # Translate word.
-        for _ in range(15):
+        for _ in range(10):
             try:
                 trans_tuple = translate(word.lower(), self.dict_manager.lang.lower(), render=True)
                 break
