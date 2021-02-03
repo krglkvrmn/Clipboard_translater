@@ -1,13 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from kivy_deps import sdl2, glew
+
 block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['/home/roman/projects/Clipboard_translater'],
+             pathex=['C:\\Users\Roman\\Clipboard_translater'],
              binaries=[],
              datas=[],
-             hiddenimports=['plyer.platforms.windows.notification'],
+             hiddenimports=['pkg_resources.py2_warn', 'plyer.platforms.win.notification'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
@@ -22,6 +24,7 @@ exe = EXE(pyz,
           a.binaries,
           a.zipfiles,
           a.datas,
+          *[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
           [],
           name='translater',
           debug=False,
@@ -30,4 +33,4 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True )
+          console=False)
