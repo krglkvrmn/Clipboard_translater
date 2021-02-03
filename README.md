@@ -82,3 +82,8 @@ Binary application will be located in **dist** folder.
 
 ## Usage
 
+Main feature of the application is distraction free translation. To enable this feature turn on switch in the bottom left of the window and choose target language.
+
+Now copy a word or a fragment of text with <ctrl+c> of <ctrl+shift+c>. If everything is done right, notification containing copied fragment and it's possible translations will appear. This output will be duplicated in main application window, where you can also translate words by typing them into text field.
+
+All words translated with selected language (all except "Guess") will be saved into corresponding ***.html** dictionary files. This includes three fields: word, translation and examples. Files are saved into directory where app is located.
