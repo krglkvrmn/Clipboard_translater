@@ -20,7 +20,7 @@ Kivy==1.11.1
 Kivy-Garden==0.1.4
 lxml==4.6.2
 plyer==1.4.3
-Pygments==2.6.1
+Pygments==2.7.4
 pyinstaller==4.0
 pyinstaller-hooks-contrib==2020.7
 pyperclip==1.8.0
