@@ -2,6 +2,8 @@
 
 App can be used for convenient word translation without distraction. Translation is implemented by Google  Translate API. Simply copy a word and get it's translation into russian.
 
+![](images/example.png)
+
 ## Installation
 
 Ready-to-use binaries can be downloaded from [releases](https://github.com/krglkvrmn/Clipboard_translater/releases) section of this repository.
