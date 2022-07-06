@@ -18,7 +18,7 @@ idna==2.10
 keyboard==0.13.5
 Kivy==1.11.1
 Kivy-Garden==0.1.4
-lxml==4.6.3
+lxml==4.9.1
 plyer==1.4.3
 Pygments==2.7.4
 pyinstaller==4.0
